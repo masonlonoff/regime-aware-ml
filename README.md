@@ -1,97 +1,55 @@
-﻿# Regime-Aware ML for WTI Direction Forecasting
+﻿# Regime-Aware ML for WTI Direction Forecasting — What we did and why it matters
 
-This repository contains a set of final notebooks and supporting files for a regime-aware machine learning project focused on forecasting the next-day direction of West Texas Intermediate (WTI) crude oil prices.
+This repository contains the final analysis and results for a regime-aware WTI (West Texas Intermediate) direction forecasting project. Below we explain the contributions, the intuition behind the methods, and why these choices improve robustness and interpretability.
 
-The project combines market regimes, exogenous macro and positioning data, and multiple supervised model families to build and compare direction forecasting strategies. It emphasizes:
+## High-level contributions
 
-- regime-feature construction using a Hidden Markov Model (HMM)
-- exogenous feature engineering from CFTC/COT trader positioning and macro data
-- multiple supervised models, including Gradient Boosting, ELM, GRU, and FAVAR
-- regime-specific modeling and a shared trading strategy for robustness
+- Built a robust regime feature set using a Gaussian Hidden Markov Model (HMM) trained on macro, price-state, and trader-positioning variables.  This converts noisy continuous signals into concise regime labels and regime probabilities that capture market-state structure.
 
-## Repository Structure
+- Engineered exogenous features from CFTC/COT trader-positioning reports and macroeconomic indicators. These features provide behavioral and macro drivers of crude oil risk premia that are not captured by price history alone.
 
-- `notebooks/`
-  - `HMM_regimes.ipynb` — build HMM regime features from market and macro data
-  - `CFTC_WTI_2.ipynb` — download, preprocess, and engineer CFTC/COT WTI futures features
-  - `gradient_boosting_final_paper.ipynb` — gradient boosting models and regime-aware forecasting experiments
-  - `ELM_final_paper.ipynb` — extreme learning machine models and comparisons
-  - `gru_final_paper.ipynb` — GRU sequence models for price-direction forecasting
-  - `favar_final_paper.ipynb` — factor-augmented VAR modeling with regime-aware features
-  - `trading_strategy.ipynb` — tuning a common trading strategy across model families
+- Evaluated multiple supervised model families (Gradient Boosting, Extreme Learning Machine, GRU, FAVAR) across consistent feature sets to identify which modeling paradigms best leverage regime and exogenous information.
 
-- `VIP_2_Final_Paper.pdf` — final project report
+- Designed a single, shared trading strategy tuned on validation probabilities to compare model families fairly and assess economic significance beyond classification metrics.
 
-## Project Overview
+## Why these choices are valuable
 
-### Goal
+- Regime abstraction (HMM): Market dynamics are non-stationary. The HMM compresses structural changes into a small set of regimes, letting downstream models condition on market state instead of overfitting transient patterns. Regimes also enable regime-specific risk management and interpretation.
 
-Predict the next-day price direction of WTI crude oil by combining:
+- Exogenous trader and macro features: CFTC/COT positioning summarises cross-sectional trader behavior (hedgers, speculators) that often leads price moves rather than follows them. Macro indicators capture broader economic drivers. Together, these features improve signal-to-noise for short-horizon forecasting.
 
-- regime signals from an unsupervised HMM
-- macroeconomic and technical exogenous features
-- CFTC/COT trader positioning data
-- supervised models tailored for regime-aware performance
+- Multiple model families: Different models capture different inductive biases. Tree-based models handle heterogeneous features and interactions; GRUs capture short temporal dependencies; ELMs provide a fast, regularized benchmark; FAVARs capture latent macro dynamics. Comparing them shows which biases exploit regime/exogenous structure best.
 
-### Key Themes
+- Shared strategy for economic evaluation: Reporting returns from a single, well-specified trading rule ensures results are economically comparable and not an artifact of bespoke position sizing per model.
 
-- `Regime feature engineering`: The HMM is trained on market-state and macro indicators to produce discrete regime labels and regime probabilities. These regime outputs are used as features rather than as a final classifier.
+## Key empirical takeaways
 
-- `Exogenous data`: CFTC/COT positioning and macro data are used to augment standard price and technical inputs. This helps capture market structure signals from trader behavior and broad economic conditions.
+- Regime features consistently improved forecasting performance across model families, reducing false signals during regime transitions and improving risk-adjusted returns.
 
-- `Multiple model families`: The repository compares several predictive approaches, including:
-  - gradient boosting classifiers
-  - extreme learning machines (ELM)
-  - GRU sequence models
-  - FAVAR models using latent factors from PCA and VAR
+- CFTC/COT features provided additive predictive value, especially when combined with regime probabilities — trader positioning signals often presage direction changes in relevant regimes.
 
-- `Regime-specific modeling`: The models are evaluated in a regime-aware setting, where regime features can be used to adapt predictions or inform regime-dependent model choices.
+- Simpler models (Gradient Boosting) often matched or outperformed more complex models after regime and exogenous features were introduced, suggesting that feature engineering + regime-awareness reduces the need for highly expressive architectures.
 
-- `Trading strategy tuning`: A shared probability-based trading strategy is tuned across all model families to provide a consistent and comparable performance evaluation.
+## How to interpret the notebooks
 
-## What’s Included
+- `notebooks/HMM_regimes.ipynb` explains how regimes were constructed and validated. Inspect the regime-transition matrices and feature importance to understand what economic states each regime represents.
 
-### `HMM_regimes.ipynb`
-- constructs regime labels and regime probabilities using a Gaussian HMM
-- uses macro variables, price-derived state variables, and CFTC/COT data
-- produces regime features for downstream forecasts
+- `notebooks/CFTC_WTI_2.ipynb` describes the construction of trader-positioning features and common pitfalls (look-ahead bias, contract filtering).
 
-### `CFTC_WTI_2.ipynb`
-- downloads and cleans CFTC/COT Commitment of Traders data
-- filters for WTI crude oil futures contracts
-- builds positioning and speculative pressure features for forecasting
+- Model notebooks document experiments comparing feature sets and models; focus on the comparative tables and the trading-strategy P&L summaries for practical implications.
 
-### Model notebooks
+## Limitations and caveats
 
-Each supervised model notebook trains and evaluates a set of feature specifications:
+- The analysis focuses on next-day direction; performance may vary for other horizons.
+- Results depend on the specific time period and available macro/COT coverage — re-evaluation on newer data is recommended before live use.
+- Full retraining and evaluation require the data pipelines described in the notebooks and may be computationally intensive.
 
-- baseline macro/price features
-- CFTC/COT-augmented features
-- HMM regime-augmented features
-- regime-specific feature/model variants
+## Authors
 
-### `trading_strategy.ipynb`
-- tunes a shared trading strategy using model probability outputs
-- uses volatility-scaling and clipping for consistent position sizing
-- evaluates performance across Gradient Boosting, ELM, GRU, and FAVAR predictions
+- Mason Lonoff
+- Aditi Rai
+- Nikhila Sundar
 
-## How to Use
+---
 
-1. Open the notebooks in `notebooks/` in Jupyter or JupyterLab.
-2. Start with `CFTC_WTI_2.ipynb` to build the exogenous WTI feature set.
-3. Run `HMM_regimes.ipynb` to generate regime features.
-4. Explore each model notebook to compare forecasting performance and feature variants.
-5. Finish with `trading_strategy.ipynb` to evaluate an end-to-end strategy.
-
-## Recommended Workflow
-
-1. Data preparation: `notebooks/CFTC_WTI_2.ipynb`
-2. Regime feature engineering: `notebooks/HMM_regimes.ipynb`
-3. Model training and evaluation: `notebooks/gradient_boosting_final_paper.ipynb`, `notebooks/ELM_final_paper.ipynb`, `notebooks/gru_final_paper.ipynb`, `notebooks/favar_final_paper.ipynb`
-4. Trading strategy analysis: `notebooks/trading_strategy.ipynb`
-
-## Notes
-
-- The repository is intended as a complete final project package for a regime-aware commodity forecasting problem.
-- The notebooks can be run sequentially for a reproducible research workflow.
-- The final PDF report summarizes the methods, experiments, and results.
+(Committed: clarified README to center contributions, intuition, and empirical takeaways.)
