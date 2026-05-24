@@ -1,5 +1,7 @@
 # Regime-Aware ML for WTI Direction Forecasting — What we did and why it matters
 
+![image](https://www.google.com/imgres?q=wti%20crude%20oil&imgurl=https%3A%2F%2Fwww.ironfx.com%2Fwp-content%2Fuploads%2F2023%2F04%2Fwti-oil.png&imgrefurl=https%3A%2F%2Fwww.ironfx.com%2Fen%2Fwti-cash-everything-you-need-to-know%2F&docid=ul5uAZjlNLJ5CM&tbnid=0vK79Tp0UOoCmM&vet=12ahUKEwjmj63xo9KUAxX2mokEHSRaNtQQnPAOegQIJRAB..i&w=825&h=344&hcb=2&ved=2ahUKEwjmj63xo9KUAxX2mokEHSRaNtQQnPAOegQIJRAB)
+
 This repository contains the final analysis and results for a regime-aware WTI (West Texas Intermediate) direction forecasting project. Below we explain the contributions, the intuition behind the methods, and why these choices improve robustness and interpretability.
 
 ## High-level contributions
@@ -47,7 +49,3 @@ This repository contains the final analysis and results for a regime-aware WTI (
 ## Author
 
 - Mason Lonoff
-
----
-
-For questions or issues, open an issue or contact the author directly.
