@@ -1,4 +1,4 @@
-# Regime-Aware ML for WTI Direction Forecasting — What we did and why it matters
+# Regime-Aware ML for WTI Direction Forecasting
 
 This repository contains the final analysis and results for a regime-aware WTI (West Texas Intermediate) direction forecasting project. Below I explain the contributions, the intuition behind the methods, and why these choices improve robustness and interpretability.
 
